@@ -304,10 +304,13 @@ async function ghGet(path) {
   const token = document.getElementById('gh-token').value.trim();
   const headers = { 'Accept': 'application/vnd.github.v3+json' };
   if (token) headers['Authorization'] = `Bearer ${token}`;
-  const r = await fetch(`https://api.github.com/repos/${REPO}/contents/${path}?ref=${BRANCH}`, { headers });
-  if (!r.ok) return null;
-  const data = await r.json();
-  return { content: JSON.parse(atob(data.content.replace(/\n/g,''))), sha: data.sha };
+  try {
+    const r = await fetch(`https://api.github.com/repos/${REPO}/contents/${path}?ref=${BRANCH}`, { headers });
+    if (!r.ok) return null;
+    const data = await r.json();
+    if (!data.content) return null;
+    return { content: JSON.parse(atob(data.content.replace(/\n/g,''))), sha: data.sha };
+  } catch(e) { return null; }
 }
 
 async function ghPut(path, content, sha) {
@@ -376,6 +379,10 @@ async function guardar() {
   btn.disabled = true;
   setEstado('Guardando...');
 
+  // Obtener SHA fresco antes de escribir
+  const current = await ghGet(CONFIG_PATH);
+  const sha = current ? current.sha : undefined;
+
   const nuevaConfig = {
     estilos: estilosSeleccionados,
     intensidad: parseInt(document.getElementById('intensidad').value),
@@ -385,7 +392,7 @@ async function guardar() {
     actualizado: new Date().toISOString()
   };
 
-  const ok = await ghPut(CONFIG_PATH, nuevaConfig, config._sha || undefined);
+  const ok = await ghPut(CONFIG_PATH, nuevaConfig, sha);
   btn.disabled = false;
 
   if (ok) {
