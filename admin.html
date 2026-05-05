@@ -246,6 +246,14 @@ let estilosSeleccionados = [];
 let tagsEvitar = [];
 let tagsPrioridad = [];
 
+window.onload = function() {
+  const t = localStorage.getItem('dm_gh_token');
+  if (t) document.getElementById('gh-token').value = t;
+  document.getElementById('gh-token').addEventListener('input', function() {
+    localStorage.setItem('dm_gh_token', this.value.trim());
+  });
+};
+
 function doLogin() {
   const pwd = document.getElementById('pwd-input').value;
   if (pwd === PASSWORD) {
