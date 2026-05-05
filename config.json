@@ -1,8 +1,8 @@
 {
-  "estilos": [],
+  "estilo": "auto",
   "intensidad": 4,
-  "priorizar": [],
-  "evitar": [],
-  "notas": "muy repetido confucio, rota mas los personajes.",
-  "actualizado": "2026-05-05T03:48:14.575Z"
+  "temas_priorizar": [],
+  "temas_evitar": [],
+  "notas_libres": "rota más a los personajes. confucio se ha repetido mucho.",
+  "actualizado": "2026-05-05T04:23:25.706Z"
 }
