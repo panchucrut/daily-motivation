@@ -2,24 +2,22 @@ name: Daily Motivation Email
 
 on:
   schedule:
-    - cron: '0 11 * * 1-5'  # Lunes a viernes, 11:00 UTC = 8:00 AM Chile
-  workflow_dispatch:  # Permite ejecutar manualmente desde GitHub
+    - cron: '0 11 * * 1-5'
+  workflow_dispatch:
 
 jobs:
   send-email:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repositorio
         uses: actions/checkout@v4
-
       - name: Configurar Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-
       - name: Ejecutar script
         env:
           MATON_API_KEY: ${{ secrets.MATON_API_KEY }}
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GH_PAT_TOKEN }}
         run: python daily_motivation_email_ai.py
