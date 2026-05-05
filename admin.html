@@ -3,412 +3,312 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Panel — Daily Motivation</title>
+<title>Sensei Admin</title>
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    background: #f9f9f7;
-    color: #1a1a1a;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 2rem 1rem;
-  }
-  #app { width: 100%; max-width: 560px; }
-  h1 { font-size: 14px; font-weight: 500; color: #888; text-align: center; margin-bottom: 2rem; letter-spacing: 0.05em; text-transform: uppercase; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: monospace; background: #111; color: #eee; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 20px; }
+  h1 { color: #f90; margin-bottom: 20px; font-size: 1.2rem; letter-spacing: 2px; }
 
-  /* LOGIN */
-  #login { display: flex; flex-direction: column; gap: 12px; margin-top: 4rem; }
-  #login input {
-    height: 44px; padding: 0 1rem;
-    border: 1px solid #ddd; border-radius: 6px;
-    font-size: 14px; background: #fff; width: 100%;
-  }
-  #login input:focus { outline: none; border-color: #1D9E75; }
+  /* Login */
+  #login-screen { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-top: 80px; }
+  #login-screen input { background: #222; border: 1px solid #444; color: #eee; padding: 10px 16px; font-size: 1rem; font-family: monospace; border-radius: 4px; width: 240px; text-align: center; }
+  #login-screen button { background: #f90; color: #000; border: none; padding: 10px 24px; font-family: monospace; font-weight: bold; cursor: pointer; border-radius: 4px; width: 240px; }
+  #login-error { color: #f55; font-size: 0.85rem; }
 
-  /* CARDS */
-  .card {
-    background: #fff;
-    border: 1px solid #e8e8e6;
-    border-radius: 8px;
-    padding: 1.25rem;
-    margin-bottom: 1rem;
-  }
-  .card-title {
-    font-size: 11px;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: #888;
-    margin-bottom: 1rem;
-  }
+  /* Panel */
+  #panel { display: none; width: 100%; max-width: 640px; }
+  .section { background: #1a1a1a; border: 1px solid #333; border-radius: 6px; padding: 16px; margin-bottom: 16px; }
+  .section h2 { font-size: 0.75rem; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
+  label { display: block; font-size: 0.85rem; color: #aaa; margin-bottom: 4px; margin-top: 10px; }
+  label:first-of-type { margin-top: 0; }
+  select, input[type="text"], textarea { width: 100%; background: #222; border: 1px solid #444; color: #eee; padding: 8px 10px; font-family: monospace; font-size: 0.9rem; border-radius: 4px; }
+  textarea { resize: vertical; min-height: 70px; }
+  input[type="range"] { width: 100%; accent-color: #f90; }
+  .range-row { display: flex; align-items: center; gap: 10px; }
+  .range-row span { color: #f90; font-weight: bold; min-width: 20px; text-align: center; }
 
-  /* ESTILOS */
-  .estilos { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-  .estilo-btn {
-    padding: 10px 12px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    font-size: 13px;
-    background: #fff;
-    color: #1a1a1a;
-    cursor: pointer;
-    text-align: left;
-    transition: all 0.1s;
-  }
-  .estilo-btn:hover { border-color: #1D9E75; }
-  .estilo-btn.activo { border-color: #1D9E75; background: #f0fdf8; color: #1D9E75; font-weight: 500; }
-  .estilo-btn .nombre { display: block; font-weight: 500; font-size: 12px; }
-  .estilo-btn .desc { display: block; font-size: 11px; color: #aaa; margin-top: 2px; }
-  .estilo-btn.activo .desc { color: #5bc8a8; }
+  /* Token */
+  .token-row { display: flex; gap: 8px; }
+  .token-row input { flex: 1; }
+  .token-row button { background: #333; color: #eee; border: 1px solid #555; padding: 8px 12px; font-family: monospace; cursor: pointer; border-radius: 4px; white-space: nowrap; }
+  .token-row button:hover { background: #444; }
 
-  /* INTENSIDAD */
-  .slider-row { display: flex; align-items: center; gap: 12px; }
-  .slider-row label { font-size: 12px; color: #888; min-width: 60px; }
-  .slider-row input[type=range] { flex: 1; accent-color: #1D9E75; }
-  .slider-val { font-size: 13px; font-weight: 500; min-width: 20px; text-align: right; }
+  /* Buttons */
+  .btn-save { width: 100%; background: #f90; color: #000; border: none; padding: 12px; font-family: monospace; font-weight: bold; font-size: 1rem; cursor: pointer; border-radius: 4px; margin-top: 4px; }
+  .btn-save:hover { background: #ffa820; }
+  .btn-save:disabled { background: #555; color: #888; cursor: not-allowed; }
+  .btn-logout { background: none; border: none; color: #555; font-family: monospace; font-size: 0.75rem; cursor: pointer; margin-top: 8px; }
+  .btn-logout:hover { color: #888; }
 
-  /* TEXTAREA */
-  textarea {
-    width: 100%; min-height: 80px;
-    padding: 10px 12px;
-    border: 1px solid #ddd; border-radius: 6px;
-    font-size: 13px; font-family: inherit;
-    resize: vertical; background: #fff;
-    color: #1a1a1a;
-  }
-  textarea:focus { outline: none; border-color: #1D9E75; }
-  textarea::placeholder { color: #bbb; }
+  /* Historial */
+  #historial-list { list-style: none; }
+  #historial-list li { padding: 8px 0; border-bottom: 1px solid #2a2a2a; font-size: 0.8rem; color: #bbb; }
+  #historial-list li:last-child { border-bottom: none; }
+  #historial-list li .fecha { color: #555; font-size: 0.75rem; }
+  #historial-list .empty { color: #555; font-style: italic; }
 
-  /* TAGS */
-  .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
-  .tag {
-    display: flex; align-items: center; gap: 4px;
-    padding: 4px 10px;
-    background: #f0fdf8; border: 1px solid #1D9E75;
-    border-radius: 20px; font-size: 12px; color: #1D9E75;
-  }
-  .tag.rojo { background: #fdf0f0; border-color: #D85A30; color: #D85A30; }
-  .tag button { background: none; border: none; cursor: pointer; font-size: 14px; line-height: 1; color: inherit; padding: 0; }
-  .tag-input { display: flex; gap: 8px; }
-  .tag-input input { flex: 1; height: 36px; padding: 0 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px; }
-  .tag-input input:focus { outline: none; border-color: #1D9E75; }
+  /* Toast */
+  #toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); background: #2a2a2a; border: 1px solid #f90; color: #eee; padding: 10px 20px; border-radius: 6px; font-size: 0.85rem; font-family: monospace; opacity: 0; transition: all 0.3s ease; z-index: 999; white-space: nowrap; }
+  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  #toast.error { border-color: #f55; }
 
-  /* HISTORIAL */
-  .historial-item {
-    padding: 10px 0;
-    border-bottom: 1px solid #f0efec;
-    font-size: 13px;
-  }
-  .historial-item:last-child { border-bottom: none; }
-  .historial-item .fecha { font-size: 11px; color: #aaa; margin-bottom: 2px; }
-  .historial-item .texto { color: #444; }
-  .historial-item .rating { float: right; }
-
-  /* BOTONES */
-  .btn {
-    height: 44px; padding: 0 1.5rem;
-    border: none; border-radius: 6px;
-    font-size: 14px; font-weight: 500;
-    cursor: pointer; transition: all 0.1s;
-  }
-  .btn-primary { background: #1D9E75; color: #fff; }
-  .btn-primary:hover { background: #178a63; }
-  .btn-primary:active { transform: scale(0.97); }
-  .btn-primary:disabled { background: #ccc; cursor: default; }
-  .btn-secondary { background: #f0efec; color: #444; }
-  .btn-secondary:hover { background: #e4e3df; }
-
-  .acciones { display: flex; gap: 8px; margin-top: 1.5rem; }
-  #estado { font-size: 12px; color: #1D9E75; margin-top: 0.75rem; text-align: center; min-height: 18px; }
-  #estado.error { color: #D85A30; }
-
-  /* TOKEN WARNING */
-  .warning {
-    background: #fffbf0; border: 1px solid #f0c060;
-    border-radius: 6px; padding: 10px 12px;
-    font-size: 12px; color: #8a6000; margin-bottom: 1rem;
-  }
-  .warning a { color: #8a6000; }
-
-  #panel { display: none; }
+  /* Status */
+  .status-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
+  .dot-ok { background: #0f0; }
+  .dot-err { background: #f55; }
+  #repo-info { font-size: 0.75rem; color: #555; margin-top: 6px; }
 </style>
 </head>
 <body>
-<div id="app">
-  <h1>Daily Motivation · Panel</h1>
 
-  <!-- LOGIN -->
-  <div id="login">
-    <input type="password" id="pwd-input" placeholder="contraseña" />
-    <button class="btn btn-primary" onclick="doLogin()">entrar</button>
+<h1>⚙ SENSEI ADMIN</h1>
+
+<!-- Login -->
+<div id="login-screen">
+  <input type="password" id="pwd-input" placeholder="contraseña" autocomplete="current-password" />
+  <div id="login-error"></div>
+  <button onclick="doLogin()">entrar</button>
+</div>
+
+<!-- Panel -->
+<div id="panel">
+
+  <!-- GitHub Token -->
+  <div class="section">
+    <h2>GitHub Token</h2>
+    <div class="token-row">
+      <input type="password" id="gh-token" placeholder="ghp_..." />
+      <button onclick="saveToken()">guardar token</button>
+      <button onclick="clearToken()">borrar</button>
+    </div>
+    <div id="repo-info"></div>
   </div>
 
-  <!-- PANEL -->
-  <div id="panel">
+  <!-- Config -->
+  <div class="section">
+    <h2>Configuración del mensaje</h2>
 
-    <div class="warning">
-      Para guardar cambios necesitas un <strong>GitHub Token</strong> con permiso <code>repo</code>.
-      <a href="https://github.com/settings/tokens/new" target="_blank">Crear token →</a>
-    </div>
-    <div style="margin-bottom:1rem;">
-      <input type="password" id="gh-token" placeholder="GitHub token (ghp_...)" style="width:100%;height:40px;padding:0 10px;border:1px solid #ddd;border-radius:6px;font-size:13px;" />
-    </div>
+    <label>Estilo</label>
+    <select id="estilo">
+      <option value="auto">🔄 Rotación automática</option>
+      <option value="chiste">🎤 Chiste chileno (Álvaro Salas / Charly)</option>
+      <option value="sabio">📜 Sabio antiguo (Confucio, Séneca...)</option>
+      <option value="graffiti">✏️ Graffiti absurdo</option>
+      <option value="action">💪 Anti-action hero (Stallone, Van Damme...)</option>
+    </select>
 
-    <!-- ESTILO -->
-    <div class="card">
-      <div class="card-title">Estilo del mensaje</div>
-      <div class="estilos">
-        <button class="estilo-btn" data-estilo="chileno" onclick="toggleEstilo(this)">
-          <span class="nombre">Chiste chileno</span>
-          <span class="desc">Álvaro Salas, remate local</span>
-        </button>
-        <button class="estilo-btn" data-estilo="sabio" onclick="toggleEstilo(this)">
-          <span class="nombre">Sabio antiguo</span>
-          <span class="desc">Confucio, Aristóteles, Sun Tzu</span>
-        </button>
-        <button class="estilo-btn" data-estilo="graffiti" onclick="toggleEstilo(this)">
-          <span class="nombre">Graffiti</span>
-          <span class="desc">Absurdo, poético, inesperado</span>
-        </button>
-        <button class="estilo-btn" data-estilo="accion" onclick="toggleEstilo(this)">
-          <span class="nombre">Action hero</span>
-          <span class="desc">Stallone, Van Damme, La Roca</span>
-        </button>
-      </div>
-      <div style="margin-top:10px;font-size:11px;color:#bbb;">Sin selección = rotar automáticamente</div>
+    <label>Intensidad del humor</label>
+    <div class="range-row">
+      <span>1</span>
+      <input type="range" id="intensidad" min="1" max="5" step="1" value="3" oninput="document.getElementById('int-val').textContent=this.value" />
+      <span>5</span>
+      <span id="int-val" style="color:#f90;min-width:20px">3</span>
     </div>
 
-    <!-- INTENSIDAD -->
-    <div class="card">
-      <div class="card-title">Intensidad del humor</div>
-      <div class="slider-row">
-        <label>Sutil</label>
-        <input type="range" min="1" max="5" value="3" id="intensidad" oninput="document.getElementById('int-val').textContent=this.value" />
-        <label style="text-align:right">Brutal</label>
-        <span class="slider-val" id="int-val">3</span>
-      </div>
-    </div>
+    <label>Temas a priorizar esta semana</label>
+    <textarea id="temas-prio" placeholder="ej: fútbol, trabajo, tecnología"></textarea>
 
-    <!-- TEMAS -->
-    <div class="card">
-      <div class="card-title">Priorizar esta semana</div>
-      <div class="tags" id="tags-prioridad"></div>
-      <div class="tag-input">
-        <input type="text" id="input-prioridad" placeholder="ej: referencias a fitness..." onkeydown="if(event.key==='Enter')addTag('prioridad')" />
-        <button class="btn btn-secondary" style="height:36px;padding:0 12px;font-size:13px;" onclick="addTag('prioridad')">+ agregar</button>
-      </div>
-    </div>
+    <label>Temas a evitar</label>
+    <textarea id="temas-evitar" placeholder="ej: política, familia"></textarea>
 
-    <div class="card">
-      <div class="card-title">Evitar</div>
-      <div class="tags" id="tags-evitar"></div>
-      <div class="tag-input">
-        <input type="text" id="input-evitar" placeholder="ej: referencias a fútbol..." onkeydown="if(event.key==='Enter')addTag('evitar')" />
-        <button class="btn btn-secondary" style="height:36px;padding:0 12px;font-size:13px;" onclick="addTag('evitar')">+ agregar</button>
-      </div>
-    </div>
+    <label>Notas libres para el AI</label>
+    <textarea id="notas" placeholder="cualquier instrucción extra..."></textarea>
+  </div>
 
-    <!-- FEEDBACK LIBRE -->
-    <div class="card">
-      <div class="card-title">Notas para el AI</div>
-      <textarea id="notas" placeholder="ej: últimos días muy largos, más absurdo, Matías dijo que le gustó el de ayer..."></textarea>
-    </div>
+  <button class="btn-save" id="btn-save" onclick="saveConfig()">💾 Guardar en GitHub</button>
 
-    <!-- HISTORIAL -->
-    <div class="card">
-      <div class="card-title">Últimos mensajes</div>
-      <div id="historial-contenido">
-        <div style="font-size:12px;color:#bbb;text-align:center;padding:1rem;">Cargando historial...</div>
-      </div>
-    </div>
+  <!-- Historial -->
+  <div class="section" style="margin-top:16px">
+    <h2>Historial (últimos 10)</h2>
+    <ul id="historial-list"><li class="empty">cargando...</li></ul>
+  </div>
 
-    <div class="acciones">
-      <button class="btn btn-primary" id="btn-guardar" onclick="guardar()">guardar configuración</button>
-      <button class="btn btn-secondary" onclick="cargarConfig()">recargar</button>
-    </div>
-    <div id="estado"></div>
-
+  <div style="text-align:center">
+    <button class="btn-logout" onclick="doLogout()">cerrar sesión</button>
   </div>
 </div>
 
+<div id="toast"></div>
+
 <script>
-const REPO  = 'panchucrut/daily-motivation';
-const BRANCH = 'main';
+const REPO = 'panchucrut/daily-motivation';
 const CONFIG_PATH = 'config.json';
 const HISTORY_PATH = 'motivation_history.json';
 const PASSWORD = 'sensei2024';
 
-let config = {};
-let estilosSeleccionados = [];
-let tagsEvitar = [];
-let tagsPrioridad = [];
-
-window.onload = function() {
-  const t = localStorage.getItem('dm_gh_token');
-  if (t) document.getElementById('gh-token').value = t;
-  document.getElementById('gh-token').addEventListener('input', function() {
-    localStorage.setItem('dm_gh_token', this.value.trim());
-  });
-};
-
+// ── Auth ──────────────────────────────────────────────────────────────────
 function doLogin() {
   const pwd = document.getElementById('pwd-input').value;
   if (pwd === PASSWORD) {
-    document.getElementById('login').style.display = 'none';
+    sessionStorage.setItem('auth', '1');
+    document.getElementById('login-screen').style.display = 'none';
     document.getElementById('panel').style.display = 'block';
-    cargarConfig();
-    cargarHistorial();
+    loadToken();
+    loadConfig();
+    loadHistorial();
   } else {
-    document.getElementById('pwd-input').style.borderColor = '#D85A30';
-    setTimeout(() => document.getElementById('pwd-input').style.borderColor = '#ddd', 1000);
-  }
-}
-document.getElementById('pwd-input').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
-
-function toggleEstilo(btn) {
-  btn.classList.toggle('activo');
-  const e = btn.dataset.estilo;
-  if (estilosSeleccionados.includes(e)) {
-    estilosSeleccionados = estilosSeleccionados.filter(x => x !== e);
-  } else {
-    estilosSeleccionados.push(e);
+    document.getElementById('login-error').textContent = 'contraseña incorrecta';
   }
 }
 
-function addTag(tipo) {
-  const input = document.getElementById(`input-${tipo}`);
-  const val = input.value.trim();
-  if (!val) return;
-  if (tipo === 'evitar') { tagsEvitar.push(val); renderTags('evitar'); }
-  else { tagsPrioridad.push(val); renderTags('prioridad'); }
-  input.value = '';
+function doLogout() {
+  sessionStorage.removeItem('auth');
+  document.getElementById('panel').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('pwd-input').value = '';
 }
 
-function removeTag(tipo, idx) {
-  if (tipo === 'evitar') tagsEvitar.splice(idx, 1);
-  else tagsPrioridad.splice(idx, 1);
-  renderTags(tipo);
+document.getElementById('pwd-input').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+
+// Auto-login si ya estaba en sesión
+if (sessionStorage.getItem('auth') === '1') {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('panel').style.display = 'block';
+  loadToken();
+  loadConfig();
+  loadHistorial();
 }
 
-function renderTags(tipo) {
-  const arr = tipo === 'evitar' ? tagsEvitar : tagsPrioridad;
-  const cls = tipo === 'evitar' ? 'rojo' : '';
-  document.getElementById(`tags-${tipo}`).innerHTML = arr.map((t,i) =>
-    `<span class="tag ${cls}">${t}<button onclick="removeTag('${tipo}',${i})">×</button></span>`
-  ).join('');
+// ── Token ─────────────────────────────────────────────────────────────────
+function saveToken() {
+  const t = document.getElementById('gh-token').value.trim();
+  if (!t) { showToast('ingresa un token primero', true); return; }
+  localStorage.setItem('gh_token', t);
+  showToast('token guardado');
+  updateRepoInfo(t);
 }
 
-function setEstado(msg, esError) {
-  const el = document.getElementById('estado');
-  el.textContent = msg;
-  el.className = esError ? 'error' : '';
-  if (msg) setTimeout(() => el.textContent = '', 4000);
+function clearToken() {
+  localStorage.removeItem('gh_token');
+  document.getElementById('gh-token').value = '';
+  document.getElementById('repo-info').innerHTML = '';
+  showToast('token borrado');
 }
 
-async function ghGet(path) {
-  const token = document.getElementById('gh-token').value.trim();
-  const headers = { 'Accept': 'application/vnd.github.v3+json' };
-  if (token) headers['Authorization'] = `Bearer ${token}`;
+function loadToken() {
+  const t = localStorage.getItem('gh_token');
+  if (t) {
+    document.getElementById('gh-token').value = t;
+    updateRepoInfo(t);
+  }
+}
+
+function getToken() { return localStorage.getItem('gh_token') || document.getElementById('gh-token').value.trim(); }
+
+async function updateRepoInfo(token) {
+  const el = document.getElementById('repo-info');
   try {
-    const r = await fetch(`https://api.github.com/repos/${REPO}/contents/${path}?ref=${BRANCH}`, { headers });
-    if (!r.ok) return null;
-    const data = await r.json();
-    if (!data.content) return null;
-    return { content: JSON.parse(atob(data.content.replace(/\n/g,''))), sha: data.sha };
-  } catch(e) { return null; }
+    const r = await ghGet(`repos/${REPO}`, token);
+    el.innerHTML = `<span class="status-dot dot-ok"></span>${REPO} ✓`;
+  } catch(e) {
+    el.innerHTML = `<span class="status-dot dot-err"></span>error al verificar repo`;
+  }
 }
 
-async function ghPut(path, content, sha) {
-  const token = document.getElementById('gh-token').value.trim();
-  if (!token) { setEstado('Falta el GitHub token', true); return false; }
+// ── GitHub API ────────────────────────────────────────────────────────────
+async function ghGet(path, token) {
+  const t = token || getToken();
+  const r = await fetch(`https://api.github.com/${path}`, {
+    headers: { Authorization: `token ${t}`, Accept: 'application/vnd.github+json' }
+  });
+  if (!r.ok) throw new Error(r.status);
+  return r.json();
+}
+
+async function ghGetFile(path) {
+  return ghGet(`repos/${REPO}/contents/${path}`);
+}
+
+async function ghPutFile(path, content, sha, message) {
+  const token = getToken();
+  if (!token) throw new Error('sin token');
   const r = await fetch(`https://api.github.com/repos/${REPO}/contents/${path}`, {
     method: 'PUT',
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      message: 'Panel: actualizar config',
-      content: btoa(unescape(encodeURIComponent(JSON.stringify(content, null, 2)))),
-      sha,
-      branch: BRANCH
-    })
+    headers: { Authorization: `token ${token}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ message, content: btoa(unescape(encodeURIComponent(content))), sha })
   });
-  return r.ok;
+  if (!r.ok) { const e = await r.json(); throw new Error(e.message || r.status); }
+  return r.json();
 }
 
-async function cargarConfig() {
-  setEstado('Cargando...');
-  const res = await ghGet(CONFIG_PATH);
-  if (!res) {
-    config = { sha: null };
-    setEstado('');
-    return;
+// ── Config ────────────────────────────────────────────────────────────────
+async function loadConfig() {
+  try {
+    const file = await ghGetFile(CONFIG_PATH);
+    const cfg = JSON.parse(atob(file.content));
+    document.getElementById('estilo').value = cfg.estilo || 'auto';
+    document.getElementById('intensidad').value = cfg.intensidad || 3;
+    document.getElementById('int-val').textContent = cfg.intensidad || 3;
+    document.getElementById('temas-prio').value = (cfg.temas_priorizar || []).join(', ');
+    document.getElementById('temas-evitar').value = (cfg.temas_evitar || []).join(', ');
+    document.getElementById('notas').value = cfg.notas_libres || '';
+  } catch(e) {
+    console.warn('No se pudo cargar config.json:', e.message);
   }
-  config = res.content;
-  config._sha = res.sha;
-
-  estilosSeleccionados = config.estilos || [];
-  tagsEvitar = config.evitar || [];
-  tagsPrioridad = config.priorizar || [];
-
-  document.querySelectorAll('.estilo-btn').forEach(btn => {
-    btn.classList.toggle('activo', estilosSeleccionados.includes(btn.dataset.estilo));
-  });
-  renderTags('evitar');
-  renderTags('prioridad');
-  document.getElementById('notas').value = config.notas || '';
-  document.getElementById('intensidad').value = config.intensidad || 3;
-  document.getElementById('int-val').textContent = config.intensidad || 3;
-  setEstado('');
 }
 
-async function cargarHistorial() {
-  const res = await ghGet(HISTORY_PATH);
-  const el = document.getElementById('historial-contenido');
-  if (!res || !res.content || !res.content.length) {
-    el.innerHTML = '<div style="font-size:12px;color:#bbb;text-align:center;padding:1rem;">Sin historial aún</div>';
-    return;
-  }
-  const items = [...res.content].reverse().slice(0, 10);
-  el.innerHTML = items.map(h => `
-    <div class="historial-item">
-      <div class="fecha">${h.date}</div>
-      <div class="texto">${h.body || h.subject}</div>
-    </div>
-  `).join('');
-}
-
-async function guardar() {
-  const btn = document.getElementById('btn-guardar');
+async function saveConfig() {
+  const btn = document.getElementById('btn-save');
   btn.disabled = true;
-  setEstado('Guardando...');
+  btn.textContent = 'guardando...';
+  try {
+    const temasPrio = document.getElementById('temas-prio').value
+      .split(',').map(s=>s.trim()).filter(Boolean);
+    const temasEvitar = document.getElementById('temas-evitar').value
+      .split(',').map(s=>s.trim()).filter(Boolean);
 
-  // Obtener SHA fresco antes de escribir
-  const current = await ghGet(CONFIG_PATH);
-  const sha = current ? current.sha : undefined;
+    const cfg = {
+      estilo: document.getElementById('estilo').value,
+      intensidad: parseInt(document.getElementById('intensidad').value),
+      temas_priorizar: temasPrio,
+      temas_evitar: temasEvitar,
+      notas_libres: document.getElementById('notas').value.trim(),
+      actualizado: new Date().toISOString()
+    };
 
-  const nuevaConfig = {
-    estilos: estilosSeleccionados,
-    intensidad: parseInt(document.getElementById('intensidad').value),
-    priorizar: tagsPrioridad,
-    evitar: tagsEvitar,
-    notas: document.getElementById('notas').value.trim(),
-    actualizado: new Date().toISOString()
-  };
+    let sha = null;
+    try { const f = await ghGetFile(CONFIG_PATH); sha = f.sha; } catch(e) {}
 
-  const ok = await ghPut(CONFIG_PATH, nuevaConfig, sha);
-  btn.disabled = false;
-
-  if (ok) {
-    setEstado('Guardado correctamente');
-    await cargarConfig();
-  } else {
-    setEstado('Error al guardar. Revisa el token.', true);
+    await ghPutFile(CONFIG_PATH, JSON.stringify(cfg, null, 2), sha, 'update config.json via admin panel');
+    showToast('✓ config guardada en GitHub');
+  } catch(e) {
+    showToast('error: ' + e.message, true);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '💾 Guardar en GitHub';
   }
+}
+
+// ── Historial ─────────────────────────────────────────────────────────────
+async function loadHistorial() {
+  const ul = document.getElementById('historial-list');
+  try {
+    const file = await ghGetFile(HISTORY_PATH);
+    const data = JSON.parse(atob(file.content));
+    const items = Array.isArray(data) ? data : (data.emails || []);
+    const last10 = items.slice(-10).reverse();
+
+    if (!last10.length) { ul.innerHTML = '<li class="empty">sin historial aún</li>'; return; }
+
+    ul.innerHTML = last10.map(e => `
+      <li>
+        <div class="fecha">${e.fecha ? new Date(e.fecha).toLocaleDateString('es-CL',{weekday:'short',day:'numeric',month:'short'}) : '?'}</div>
+        <div>${e.body || e.mensaje || e.content || '(sin texto)'}</div>
+      </li>
+    `).join('');
+  } catch(e) {
+    ul.innerHTML = '<li class="empty">no se pudo cargar historial</li>';
+  }
+}
+
+// ── Toast ─────────────────────────────────────────────────────────────────
+let toastTimer;
+function showToast(msg, isError) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'show' + (isError ? ' error' : '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { el.className = ''; }, 3000);
 }
 </script>
 </body>
