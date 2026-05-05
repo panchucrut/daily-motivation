@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wordle para la mejor version de Levy</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #f9f9f7;
+    color: #1a1a1a;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem 1rem;
+  }
+  #app { width: 100%; max-width: 480px; }
+  #titulo {
+    font-size: 14px;
+    font-weight: 500;
+    color: #1a1a1a;
+    text-align: center;
+    margin-bottom: 0.25rem;
+  }
+  #largo-info {
+    text-align: center;
+    font-size: 11px;
+    color: #888;
+    margin-bottom: 1.25rem;
+  }
+  #msg {
+    text-align: center;
+    font-size: 13px;
+    min-height: 20px;
+    color: #666;
+    margin-bottom: 0.75rem;
+  }
+  #msg.ganaste { color: #1D9E75; font-weight: 500; }
+  #msg.perdiste { color: #D85A30; font-weight: 500; }
+  #pista {
+    text-align: center;
+    font-size: 11px;
+    color: #aaa;
+    margin-bottom: 0.75rem;
+    min-height: 16px;
+  }
+  #grilla {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    align-items: center;
+    margin-bottom: 1.25rem;
+  }
+  .fila { display: flex; gap: 5px; }
+  .celda {
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 500;
+    background: #fff;
+    color: #1a1a1a;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+    text-transform: uppercase;
+    user-select: none;
+  }
+  .celda.activa   { border-color: #888; }
+  .celda.correcto { background: #1D9E75; border-color: #1D9E75; color: #fff; }
+  .celda.posicion { background: #BA7517; border-color: #BA7517; color: #fff; }
+  .celda.ausente  { background: #e8e8e6; border-color: transparent; color: #666; }
+  #teclado { display: flex; flex-direction: column; gap: 5px; align-items: center; margin-bottom: 1rem; }
+  .fila-tec { display: flex; gap: 4px; }
+  .tec {
+    height: 42px; min-width: 32px; padding: 0 8px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 13px; font-weight: 500;
+    background: #f0efec;
+    color: #1a1a1a;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: background 0.1s;
+  }
+  .tec:hover { background: #e4e3df; }
+  .tec:active { transform: scale(0.96); }
+  .tec.correcto { background: #1D9E75; border-color: #1D9E75; color: #fff; }
+  .tec.posicion { background: #BA7517; border-color: #BA7517; color: #fff; }
+  .tec.ausente  { background: #c8c8c5; border-color: transparent; color: #555; }
+  #btn-aceptar {
+    display: block;
+    margin: 0 auto;
+    height: 44px;
+    padding: 0 2rem;
+    background: #1D9E75;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    letter-spacing: 0.03em;
+    transition: background 0.15s, transform 0.1s;
+  }
+  #btn-aceptar:hover { background: #178a63; }
+  #btn-aceptar:active { transform: scale(0.97); }
+  #btn-aceptar:disabled { background: #ccc; cursor: default; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="titulo">wordle para la mejor version de levy</div>
+  <div id="largo-info"></div>
+  <div id="msg"></div>
+  <div id="grilla"></div>
+  <div id="pista"></div>
+  <div id="teclado"></div>
+  <button id="btn-aceptar">aceptar</button>
+</div>
+<script>
+const PALABRAS = [
+  {w:"PICHULA",    p:"La más popular del diccionario chileno"},
+  {w:"CALLAMPA",   p:"También es un hongo, dicen"},
+  {w:"COYOMA",     p:"Término técnico de la jerga médica nacional"},
+  {w:"CORNETA",    p:"Instrumento de viento, entre otras cosas"},
+  {w:"MANGUERA",   p:"Útil para regar el jardín"},
+  {w:"PEPINO",     p:"Vegetal alargado, muy nutritivo"},
+  {w:"ANACONDA",   p:"Serpiente sudamericana de considerable tamaño"},
+  {w:"DIUCA",      p:"Pájaro chileno muy querido"},
+  {w:"PIRULA",     p:"Variante regional de uso frecuente"},
+  {w:"CHULAPI",    p:"Diminutivo cariñoso de uso frecuente"},
+  {w:"NEPE",       p:"Monosílabo contundente"},
+  {w:"TULA",       p:"Clásico del habla popular chilena"},
+  {w:"SALCHICHON", p:"Embutido de considerable formato"},
+  {w:"LONGANIZA",  p:"Prima del salchichón, también alargada"},
+  {w:"TALADRO",    p:"Herramienta eléctrica de uso doméstico"},
+  {w:"PICO",       p:"Lo que tiene un pájaro, entre otros"},
+  {w:"MANGUACO",   p:"Variante del clásico, con prestancia"},
+  {w:"PIJA",       p:"Término de uso extendido en el Cono Sur"},
+  {w:"MANI",       p:"Legumbre pequeña pero apreciada"},
+  {w:"TRANCA",     p:"También sirve para cerrar puertas"},
+  {w:"PENCA",      p:"Planta suculenta, entre otras acepciones"},
+  {w:"VERGA",      p:"Parte del velero, también"},
+  {w:"PALANCA",    p:"Principio físico de Arquímedes"},
+  {w:"PEDAZO",     p:"Fracción de algo mayor"},
+  {w:"PITULIN",    p:"Diminutivo afectuoso muy chileno"},
+  {w:"HERRAMIENTA",p:"Objeto de trabajo, en sentido amplio"},
+  {w:"CHAMPINON",  p:"Hongo comestible de forma característica"},
+  {w:"GANSO",      p:"Ave palmípeda de cuello largo"},
+  {w:"NUTRIA",     p:"Mamífero semiacuático"},
+  {w:"GUSANITO",   p:"Diminutivo entrañable"},
+  {w:"NINIPI",     p:"El más pequeño del diccionario"},
+  {w:"FIERRO",     p:"Material de construcción resistente"},
+  {w:"PALO",       p:"También sirve para jugar béisbol"},
+  {w:"VIRULA",     p:"Término de sonoridad peculiar"},
+  {w:"CACHO",      p:"También lo tienen las vacas"},
+];
+
+const hoy = new Date();
+const seed = hoy.getFullYear()*10000 + (hoy.getMonth()+1)*100 + hoy.getDate();
+const DATO = PALABRAS[seed % PALABRAS.length];
+const OBJETIVO = DATO.w.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+const LARGO = OBJETIVO.length;
+
+// 5 letras = 5 intentos; +1 intento por cada 2 letras adicionales (redondeando hacia arriba)
+const MAX_INT = 5 + Math.ceil(Math.max(0, LARGO - 5) / 2);
+
+let intentos = [], actual = "", terminado = false;
+const estadoTec = {};
+
+function celSize() { return LARGO<=6?44:LARGO<=8?38:LARGO<=10?33:28; }
+function celFs()   { return LARGO<=6?16:LARGO<=8?14:12; }
+
+function buildGrilla() {
+  const g = document.getElementById('grilla');
+  g.innerHTML = '';
+  const tam = celSize(), fs = celFs();
+  for (let i = 0; i < MAX_INT; i++) {
+    const fila = document.createElement('div');
+    fila.className = 'fila'; fila.id = 'fila-' + i;
+    for (let j = 0; j < LARGO; j++) {
+      const c = document.createElement('div');
+      c.className = 'celda'; c.id = `c-${i}-${j}`;
+      c.style.cssText = `width:${tam}px;height:${tam}px;font-size:${fs}px`;
+      fila.appendChild(c);
+    }
+    g.appendChild(fila);
+  }
+  document.getElementById('largo-info').textContent = `${LARGO} letras · ${MAX_INT} intentos`;
+}
+
+function buildTeclado() {
+  const filas = [
+    ['Q','W','E','R','T','Y','U','I','O','P'],
+    ['A','S','D','F','G','H','J','K','L','Ñ'],
+    ['Z','X','C','V','B','N','M','⌫']
+  ];
+  const tk = document.getElementById('teclado');
+  tk.innerHTML = '';
+  filas.forEach(fr => {
+    const div = document.createElement('div');
+    div.className = 'fila-tec';
+    fr.forEach(k => {
+      const btn = document.createElement('button');
+      btn.className = 'tec'; btn.textContent = k; btn.id = 'k-' + k;
+      if (k === '⌫') btn.style.minWidth = '48px';
+      btn.addEventListener('click', () => handleKey(k));
+      div.appendChild(btn);
+    });
+    tk.appendChild(div);
+  });
+}
+
+function updateGrilla() {
+  const tam = celSize(), fs = celFs(), fila = intentos.length;
+  for (let j = 0; j < LARGO; j++) {
+    const c = document.getElementById(`c-${fila}-${j}`);
+    c.textContent = actual[j] || '';
+    c.className = 'celda' + (actual[j] ? ' activa' : '');
+    c.style.cssText = `width:${tam}px;height:${tam}px;font-size:${fs}px`;
+  }
+}
+
+function evaluar(intento) {
+  const res = Array(LARGO).fill('ausente');
+  const obj = OBJETIVO.split(''), int = intento.split(''), usados = Array(LARGO).fill(false);
+  for (let i = 0; i < LARGO; i++)
+    if (int[i] === obj[i]) { res[i] = 'correcto'; usados[i] = true; int[i] = null; }
+  for (let i = 0; i < LARGO; i++) {
+    if (!int[i]) continue;
+    for (let j = 0; j < LARGO; j++)
+      if (!usados[j] && int[i] === obj[j]) { res[i] = 'posicion'; usados[j] = true; break; }
+  }
+  return res;
+}
+
+function mostrarIntento(intento, resultado, filaIdx) {
+  const tam = celSize(), fs = celFs();
+  for (let j = 0; j < LARGO; j++) {
+    const c = document.getElementById(`c-${filaIdx}-${j}`);
+    c.textContent = intento[j];
+    c.className = 'celda ' + resultado[j];
+    c.style.cssText = `width:${tam}px;height:${tam}px;font-size:${fs}px`;
+  }
+}
+
+function updateTeclado(intento, resultado) {
+  const p = {correcto:3, posicion:2, ausente:1};
+  for (let i = 0; i < intento.length; i++) {
+    const k = intento[i], nuevo = resultado[i];
+    if (!estadoTec[k] || p[nuevo] > p[estadoTec[k]]) {
+      estadoTec[k] = nuevo;
+      const btn = document.getElementById('k-' + k);
+      if (btn) btn.className = 'tec ' + nuevo;
+    }
+  }
+}
+
+function setMsg(txt, tipo) {
+  const el = document.getElementById('msg');
+  el.textContent = txt; el.className = tipo || '';
+}
+
+function confirmar() {
+  if (terminado) return;
+  if (actual.length < LARGO) { setMsg('Faltan letras'); return; }
+  const res = evaluar(actual);
+  mostrarIntento(actual, res, intentos.length);
+  updateTeclado(actual, res);
+  intentos.push(actual);
+  if (res.every(r => r === 'correcto')) {
+    terminado = true;
+    document.getElementById('btn-aceptar').disabled = true;
+    setMsg('Eso sí que es cultura general', 'ganaste');
+    document.getElementById('pista').textContent = '';
+    return;
+  }
+  if (intentos.length >= MAX_INT) {
+    terminado = true;
+    document.getElementById('btn-aceptar').disabled = true;
+    setMsg('Era: ' + OBJETIVO, 'perdiste');
+    document.getElementById('pista').textContent = DATO.p;
+    return;
+  }
+  actual = ''; setMsg(''); updateGrilla();
+}
+
+function handleKey(k) {
+  if (terminado) return;
+  if (k === '⌫') { actual = actual.slice(0, -1); updateGrilla(); return; }
+  if (actual.length < LARGO && /^[A-ZÑ]$/.test(k)) { actual += k; updateGrilla(); }
+}
+
+document.getElementById('btn-aceptar').addEventListener('click', confirmar);
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Backspace') { handleKey('⌫'); return; }
+  if (e.key === 'Enter') { confirmar(); return; }
+  const k = e.key.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  if (/^[A-ZÑ]$/.test(k)) handleKey(k);
+});
+
+buildGrilla();
+buildTeclado();
+</script>
+</body>
+</html>
