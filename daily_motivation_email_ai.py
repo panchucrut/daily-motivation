@@ -147,6 +147,11 @@ def build_prompt(config, day_info, history_subjects, matias_reply):
     notas_texto     = f"\nNOTAS ADICIONALES DEL OPERADOR: {notas}" if notas else ""
     reply_texto     = f"\nULTIMA RESPUESTA DE MATIAS: \"{matias_reply}\"" if matias_reply else ""
 
+    if estilo_sel == 'paya':
+        formato_chars = "- Exactamente 4 versos separados por salto de linea (\\n), sin limite de caracteres"
+    else:
+        formato_chars = "- Maximo 200 caracteres en el body"
+
     return f"""Eres Francisco Cruz. Le mandas un email diario a tu amigo Matias Levy.
 
 FECHA: {day_info['day']} {day_info['date']}
@@ -160,7 +165,7 @@ pichula, callampa, chulapi, nepe, tula, corneta, cuchuflí de carne, manguera de
 {priorizar_texto}{evitar_texto}{notas_texto}{reply_texto}
 
 FORMATO:
-- Maximo 200 caracteres en el body
+{formato_chars}
 - Sin emojis
 - Sin preguntar por planes
 - Firma: "Sensei"
