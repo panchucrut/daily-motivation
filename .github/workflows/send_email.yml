@@ -5,6 +5,9 @@ on:
     - cron: '0 11 * * 1-5'
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   send-email:
     runs-on: ubuntu-latest
@@ -19,5 +22,5 @@ jobs:
         env:
           MATON_API_KEY: ${{ secrets.MATON_API_KEY }}
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
-          GITHUB_TOKEN: ${{ secrets.GH_PAT_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
         run: python daily_motivation_email_ai.py
