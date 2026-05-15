@@ -75,12 +75,11 @@ def get_history_subjects(history, n=7):
 # Leer config.json desde GitHub
 def load_remote_config():
     try:
-        url = f'https://raw.githubusercontent.com/{REPO}/{BRANCH}/config.json'
-        req = urllib.request.Request(url)
-        if GITHUB_TOKEN:
-            req.add_header('Authorization', f'Bearer {GITHUB_TOKEN}')
-        with urllib.request.urlopen(req, timeout=10) as r:
-            return json.load(r)
+        data, status = gh_api("GET", f"repos/{REPO}/contents/config.json")
+        if status == 200:
+            return json.loads(base64.b64decode(data["content"].replace("\n", "")).decode("utf-8"))
+        print(f"Config remota no disponible (HTTP {status}), usando defaults")
+        return {}
     except Exception as e:
         print(f"Config remota no disponible ({e}), usando defaults")
         return {}
