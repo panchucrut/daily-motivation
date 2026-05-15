@@ -98,7 +98,7 @@ def get_matias_replies():
         if not messages:
             return None
         msg_id = messages[0]['id']
-        msg_url = f'https://gateway.maton.ai/google-mail/gmail/v1/users/me/messages/{msg_id}?format=snippet'
+        msg_url = f'https://gateway.maton.ai/google-mail/gmail/v1/users/me/messages/{msg_id}?format=metadata'
         req2 = urllib.request.Request(msg_url)
         req2.add_header('Authorization', f'Bearer {MATON_API_KEY}')
         req2.add_header('Maton-Connection', CELTAVIA_CONNECTION_ID)
