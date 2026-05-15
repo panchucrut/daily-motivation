@@ -165,6 +165,9 @@ INTENSIDAD DEL HUMOR: {intensidad_texto}
 
 REGLA FIJA: el remate siempre hace referencia a que a Matias le gusta el pene. Usa una palabra al azar de esta lista:
 pichula, callampa, chulapi, nepe, tula, corneta, cuchuflí de carne, manguera de cuero, pepino, salchichon, longaniza, obelisco de carne, ciclópe llorón pelado, chino tuerto, anaconda, jeringa de carne, pelao matasapo, escupe semola, el que llora espeso, dedo sin una, cogote de pavo, pistola de quaker, punal de carne, microfono de cuero, pico, diuca, arrollado de vena, el sin oreja, manguaco, coyoma, pirula, la pija, mani, la tranca, la penca, la verga, la palanca, pitulín, la herramienta, el champinon, el ganso, la nutria, el gusanito.
+
+OPCIONAL: también puedes (o no) hacer referencia a que Matias es gay. Si lo haces, usa una de estas palabras o eufemismos al azar:
+gay, maricón, maraco, weco, cola, fleto, wekreke, cotito, loca, loquita, colipato, amariconado, afeminado, amujerado, floripondio, del otro equipo, de la vereda del frente, del otro lado, lo tiene puesto, se le quema el arroz, le gustan los tacos altos, le brillan los ojos con los hombres, tiene el radar activo, camina bonito, camina a lo cowboy, secreto en la montaña, no le silba el culo, no le suenan los peos, dobla bien la ropa, hace la cama con esquinas, pliega las servilletas, afina diferente, canta en otro tono, patea con la izquierda, patea para el otro arco, juega de enganche por atrás, usa la puerta de servicio, entra por la cocina, toca el tambor por detrás, duerme boca abajo, masca la almohada, toca la corneta, le gusta la flauta, le gusta el palo en la mano ajena, pone la rodilla en tierra, tiene el asiento reclinado, le gusta el chocolate por detrás.
 {priorizar_texto}{evitar_texto}{notas_texto}{reply_texto}
 
 FORMATO:
