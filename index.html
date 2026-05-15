@@ -119,41 +119,54 @@
 </div>
 <script>
 const PALABRAS = [
-  {w:"PICHULA",    p:"La más popular del diccionario chileno"},
-  {w:"CALLAMPA",   p:"También es un hongo, dicen"},
-  {w:"COYOMA",     p:"Término técnico de la jerga médica nacional"},
+  {w:"PICHULA",    p:"La mÃ¡s popular del diccionario chileno"},
+  {w:"CALLAMPA",   p:"TambiÃ©n es un hongo, dicen"},
+  {w:"COYOMA",     p:"TÃ©rmino tÃ©cnico de la jerga mÃ©dica nacional"},
   {w:"CORNETA",    p:"Instrumento de viento, entre otras cosas"},
-  {w:"MANGUERA",   p:"Útil para regar el jardín"},
+  {w:"MANGUERA",   p:"Ãtil para regar el jardÃ­n"},
   {w:"PEPINO",     p:"Vegetal alargado, muy nutritivo"},
-  {w:"ANACONDA",   p:"Serpiente sudamericana de considerable tamaño"},
-  {w:"DIUCA",      p:"Pájaro chileno muy querido"},
+  {w:"ANACONDA",   p:"Serpiente sudamericana de considerable tamaÃ±o"},
+  {w:"DIUCA",      p:"PÃ¡jaro chileno muy querido"},
   {w:"PIRULA",     p:"Variante regional de uso frecuente"},
-  {w:"CHULAPI",    p:"Diminutivo cariñoso de uso frecuente"},
-  {w:"NEPE",       p:"Monosílabo contundente"},
-  {w:"TULA",       p:"Clásico del habla popular chilena"},
+  {w:"CHULAPI",    p:"Diminutivo cariÃ±oso de uso frecuente"},
+  {w:"NEPE",       p:"MonosÃ­labo contundente"},
+  {w:"TULA",       p:"ClÃ¡sico del habla popular chilena"},
   {w:"SALCHICHON", p:"Embutido de considerable formato"},
-  {w:"LONGANIZA",  p:"Prima del salchichón, también alargada"},
-  {w:"TALADRO",    p:"Herramienta eléctrica de uso doméstico"},
-  {w:"PICO",       p:"Lo que tiene un pájaro, entre otros"},
-  {w:"MANGUACO",   p:"Variante del clásico, con prestancia"},
-  {w:"PIJA",       p:"Término de uso extendido en el Cono Sur"},
-  {w:"MANI",       p:"Legumbre pequeña pero apreciada"},
-  {w:"TRANCA",     p:"También sirve para cerrar puertas"},
+  {w:"LONGANIZA",  p:"Prima del salchichÃ³n, tambiÃ©n alargada"},
+  {w:"TALADRO",    p:"Herramienta elÃ©ctrica de uso domÃ©stico"},
+  {w:"PICO",       p:"Lo que tiene un pÃ¡jaro, entre otros"},
+  {w:"MANGUACO",   p:"Variante del clÃ¡sico, con prestancia"},
+  {w:"PIJA",       p:"TÃ©rmino de uso extendido en el Cono Sur"},
+  {w:"MANI",       p:"Legumbre pequeÃ±a pero apreciada"},
+  {w:"TRANCA",     p:"TambiÃ©n sirve para cerrar puertas"},
   {w:"PENCA",      p:"Planta suculenta, entre otras acepciones"},
-  {w:"VERGA",      p:"Parte del velero, también"},
-  {w:"PALANCA",    p:"Principio físico de Arquímedes"},
-  {w:"PEDAZO",     p:"Fracción de algo mayor"},
+  {w:"VERGA",      p:"Parte del velero, tambiÃ©n"},
+  {w:"PALANCA",    p:"Principio fÃ­sico de ArquÃ­medes"},
+  {w:"PEDAZO",     p:"FracciÃ³n de algo mayor"},
   {w:"PITULIN",    p:"Diminutivo afectuoso muy chileno"},
   {w:"HERRAMIENTA",p:"Objeto de trabajo, en sentido amplio"},
-  {w:"CHAMPINON",  p:"Hongo comestible de forma característica"},
-  {w:"GANSO",      p:"Ave palmípeda de cuello largo"},
-  {w:"NUTRIA",     p:"Mamífero semiacuático"},
-  {w:"GUSANITO",   p:"Diminutivo entrañable"},
-  {w:"NINIPI",     p:"El más pequeño del diccionario"},
-  {w:"FIERRO",     p:"Material de construcción resistente"},
-  {w:"PALO",       p:"También sirve para jugar béisbol"},
-  {w:"VIRULA",     p:"Término de sonoridad peculiar"},
-  {w:"CACHO",      p:"También lo tienen las vacas"},
+  {w:"CHAMPINON",  p:"Hongo comestible de forma caracterÃ­stica"},
+  {w:"GANSO",      p:"Ave palmÃ­peda de cuello largo"},
+  {w:"NUTRIA",     p:"MamÃ­fero semiacuÃ¡tico"},
+  {w:"GUSANITO",   p:"Diminutivo entraÃ±able"},
+  {w:"NINIPI",     p:"El mÃ¡s pequeÃ±o del diccionario"},
+  {w:"FIERRO",     p:"Material de construcciÃ³n resistente"},
+  {w:"PALO",       p:"TambiÃ©n sirve para jugar bÃ©isbol"},
+  {w:"VIRULA",     p:"TÃ©rmino de sonoridad peculiar"},
+  {w:"CACHO",      p:"TambiÃ©n lo tienen las vacas"},
+,
+  {w:"GAY",         p:"Feliz, alegre, y otras cosas"},
+  {w:"MARACO",      p:"Variante regional de uso frecuente"},
+  {w:"WECO",        p:"Término técnico del vocabulario chileno"},
+  {w:"COLA",        p:"También la tienen los animales"},
+  {w:"FLETO",       p:"Clásico del argot popular chileno"},
+  {w:"COTITO",      p:"Diminutivo cariñoso, cargado de significado"},
+  {w:"LOCA",        p:"Puede ser un adjetivo o una identidad"},
+  {w:"LOQUITA",     p:"Versión diminutiva de loca"},
+  {w:"COLIPATO",    p:"Término compuesto de notable creatividad"},
+  {w:"MARICON",     p:"Palabra que Matías conoce bien"},
+  {w:"AFEMINADO",   p:"Diccionario de la RAE, página 42"},
+  {w:"FLORIPONDIO", p:"Flor aromática, también apodo"},
 ];
 
 const hoy = new Date();
@@ -186,14 +199,14 @@ function buildGrilla() {
     }
     g.appendChild(fila);
   }
-  document.getElementById('largo-info').textContent = `${LARGO} letras · ${MAX_INT} intentos`;
+  document.getElementById('largo-info').textContent = `${LARGO} letras Â· ${MAX_INT} intentos`;
 }
 
 function buildTeclado() {
   const filas = [
     ['Q','W','E','R','T','Y','U','I','O','P'],
-    ['A','S','D','F','G','H','J','K','L','Ñ'],
-    ['Z','X','C','V','B','N','M','⌫']
+    ['A','S','D','F','G','H','J','K','L','Ã'],
+    ['Z','X','C','V','B','N','M','â«']
   ];
   const tk = document.getElementById('teclado');
   tk.innerHTML = '';
@@ -203,7 +216,7 @@ function buildTeclado() {
     fr.forEach(k => {
       const btn = document.createElement('button');
       btn.className = 'tec'; btn.textContent = k; btn.id = 'k-' + k;
-      if (k === '⌫') btn.style.minWidth = '48px';
+      if (k === 'â«') btn.style.minWidth = '48px';
       btn.addEventListener('click', () => handleKey(k));
       div.appendChild(btn);
     });
@@ -271,7 +284,7 @@ function confirmar() {
   if (res.every(r => r === 'correcto')) {
     terminado = true;
     document.getElementById('btn-aceptar').disabled = true;
-    setMsg('Eso sí que es cultura general', 'ganaste');
+    setMsg('Eso sÃ­ que es cultura general', 'ganaste');
     document.getElementById('pista').textContent = '';
     return;
   }
@@ -287,17 +300,17 @@ function confirmar() {
 
 function handleKey(k) {
   if (terminado) return;
-  if (k === '⌫') { actual = actual.slice(0, -1); updateGrilla(); return; }
-  if (actual.length < LARGO && /^[A-ZÑ]$/.test(k)) { actual += k; updateGrilla(); }
+  if (k === 'â«') { actual = actual.slice(0, -1); updateGrilla(); return; }
+  if (actual.length < LARGO && /^[A-ZÃ]$/.test(k)) { actual += k; updateGrilla(); }
 }
 
 document.getElementById('btn-aceptar').addEventListener('click', confirmar);
 
 document.addEventListener('keydown', e => {
-  if (e.key === 'Backspace') { handleKey('⌫'); return; }
+  if (e.key === 'Backspace') { handleKey('â«'); return; }
   if (e.key === 'Enter') { confirmar(); return; }
   const k = e.key.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
-  if (/^[A-ZÑ]$/.test(k)) handleKey(k);
+  if (/^[A-ZÃ]$/.test(k)) handleKey(k);
 });
 
 buildGrilla();
