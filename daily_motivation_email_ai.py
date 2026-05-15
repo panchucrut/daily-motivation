@@ -110,6 +110,10 @@ def get_matias_replies():
             print(f"Respuesta de Matias: {snippet[:80]}...")
             return snippet
         return None
+    except urllib.error.HTTPError as e:
+        body = e.read().decode('utf-8', errors='replace')
+        print(f"Maton Gmail error {e.code}: {body[:300]}")
+        return None
     except Exception as e:
         print(f"No se pudo leer respuestas de Matias: {e}")
         return None
