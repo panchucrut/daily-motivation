@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-daily_motivation_email_ai.py — v3.1
+daily_motivation_email_ai.py — v3.2
 - Lee config.json desde GitHub para ajustar el prompt dinamicamente
 - Lee ultimas respuestas de Matias via Gmail API
 - Incluye link al Wordle en el email
@@ -25,6 +25,32 @@ CELTAVIA_CONNECTION_ID = 'de11f065-b424-4174-8116-fbb2c5bc5510'
 WORDLE_URL             = 'https://panchucrut.github.io/daily-motivation/'
 REPO                   = 'panchucrut/daily-motivation'
 BRANCH                 = 'main'
+
+# He-Man Shorts (rotan por dia del año)
+HEMAN_SHORTS = [
+    "https://www.youtube.com/shorts/Dg8tHpjqxfQ",   # hombre sabio
+    "https://www.youtube.com/shorts/tpNn0-s97Xo",   # combatir el estres
+    "https://www.youtube.com/shorts/qrJL4DmWU8k",   # no ser arrestado
+    "https://www.youtube.com/shorts/WymmEl93TYg",   # Fisto le echa una mano
+    "https://www.youtube.com/shorts/aEmSsJaAT-o",   # las cariñosas
+    "https://www.youtube.com/shorts/eY6fi3WoKPg",   # tener hambre
+    "https://www.youtube.com/shorts/hsLI2QuXeFE",   # consejo laboral
+    "https://www.youtube.com/shorts/xjfZCUMYN8A",   # consejo motivacional
+    "https://www.youtube.com/shorts/NF6P_WDMlJA",   # pedir perdon
+    "https://www.youtube.com/shorts/vd3Y9NyuDWA",   # dormir bien
+    "https://www.youtube.com/shorts/U36tu07Swvo",   # generar dinero
+    "https://www.youtube.com/shorts/LN6DSHb0CEA",   # consejo general
+    "https://www.youtube.com/shorts/ZYJuVpdMMEU",   # fidelidad
+    "https://www.youtube.com/shorts/FQxUzLpD_bI",   # el mejor consejo
+    "https://www.youtube.com/shorts/wHqw1JFPgS8",   # intro spawned memes
+    "https://www.youtube.com/shorts/x_ynXXEitP0",   # he-man coreano
+    "https://www.youtube.com/shorts/xnE2AnJrtuU",   # PSA hugging
+    "https://www.youtube.com/shorts/el9ejqhcJ-g",   # 4 Non Blondes vs He-Man
+    "https://www.youtube.com/shorts/YRRLYEVUQpQ",   # He-Man PSA
+    "https://www.youtube.com/shorts/txsy72SJXys",   # He-Man PSA 2
+    "https://www.youtube.com/shorts/V3X5v6BXZHI",   # He-Man meme
+    "https://www.youtube.com/shorts/QlKBtfl0pf0",   # He-Man PSA 3
+]
 
 # Credenciales
 MATON_API_KEY      = os.environ.get('MATON_API_KEY')
@@ -124,6 +150,8 @@ def build_prompt(config, day_info, history_subjects, matias_reply):
         'sabio':    'FRASE ABSURDA DE SABIO ANTIGUO: inventada, que suene profunda pero sea una estupidez. Cita a Confucio, Aristoteles, Sun Tzu, Seneca, etc.',
         'graffiti': 'FRASE DE GRAFFITI: absurda, poetica de forma ridicula, remate inesperado.',
         'action':   'ESTILO ANTI-CHUCK NORRIS: Matias NO es un duro. Usa a Stallone, Van Damme, Seagal, Bruce Lee, Schwarzenegger, La Roca, Statham.',
+        'paya':     'PAYA CHILENA: cuarteta de 4 versos en rima ABAB o ABCB, estilo payador campesino chileno. Maximo 2 versos de setup, remate picante en los ultimos 2.',
+        'cuento':   'CUENTO ULTRA-BREVE: historia de maximo 4 lineas. Personaje, situacion, giro, remate. Estilo absurdo o de humor negro chileno.',
     }
 
     estilo_sel = config.get('estilo', 'auto')
@@ -151,7 +179,11 @@ def build_prompt(config, day_info, history_subjects, matias_reply):
     reply_texto     = f"\nULTIMA RESPUESTA DE MATIAS: \"{matias_reply}\"" if matias_reply else ""
 
     if estilo_sel == 'paya':
-        formato_chars = "- Exactamente 4 versos separados por salto de linea (\\n), sin limite de caracteres"
+        formato_chars = "- Exactamente 4 versos separados por salto de linea (\\n), sin limite de caracteres total"
+    elif estilo_sel == 'cuento':
+        formato_chars = "- Hasta 4 lineas separadas por salto de linea (\\n), sin limite de caracteres total"
+    elif estilo_sel == 'auto':
+        formato_chars = "- Si eliges paya o cuento: hasta 4 lineas separadas por \\n, sin limite de chars. Si eliges otro estilo: maximo 200 caracteres"
     else:
         formato_chars = "- Maximo 200 caracteres en el body"
 
@@ -222,8 +254,13 @@ def generate_ai_content(config, day_info, history):
         print(f"Error IA: {e}")
         return {"subject": "Motivacion diaria", "body": f"Hoy es {day_info['day']}. Por si no te habias dado cuenta.\n\nSensei"}
 
+def get_heman_link():
+    idx = datetime.now().timetuple().tm_yday % len(HEMAN_SHORTS)
+    return HEMAN_SHORTS[idx]
+
 def build_body(ai_body):
-    return f"{ai_body}\n\n---\nWordle de hoy: {WORDLE_URL}"
+    heman = get_heman_link()
+    return f"{ai_body}\n\n---\nWordle de hoy: {WORDLE_URL}\nHe-Man del dia: {heman}"
 
 def send_email(subject, body):
     from email.mime.text import MIMEText
@@ -265,7 +302,7 @@ def send_email(subject, body):
 
 def main():
     print("=" * 60)
-    print(f"DAILY MOTIVATION v3.1 - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    print(f"DAILY MOTIVATION v3.2 - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print("=" * 60)
 
     if not MATON_API_KEY:
