@@ -15,6 +15,7 @@ import os
 import json
 import sys
 import base64
+import random
 from datetime import datetime
 
 if sys.platform == 'win32':
@@ -27,6 +28,578 @@ REPO                   = 'panchucrut/daily-motivation'
 BRANCH                 = 'main'
 
 # He-Man Shorts (rotan por dia del año)
+ASCII_PENES = [
+    # --- CLÁSICOS ---
+    "8====D~~~",
+    "8==========D~~~~~~~~~~",
+    "(__)8====D~~~",
+    "( oo )8==========D~~~~~~~~~",
+    "~~~~~8<====",
+    "~~~~D====8~  (al reves, como le gusta a ti)",
+
+    # --- EL OBELISCO ---
+    """
+   OBELISCO DE CARNE
+        /\\
+       /  \\
+      / 8= \\
+     / === \\
+    / ==D~~ \\
+   /~~~~~~~~~\\
+  /___________\\""",
+
+    # --- EL COHETE ---
+    """
+        *  *  *
+       * * * * *
+      *    8    *
+     *    ===    *
+    *    ===D     *
+   *   ~~~~~~~~~   *
+  *  ~~~~~~~~~~~~~~~  *
+ (  )             (  )
+  --               --""",
+
+    # --- EL CLÁSICO VERTICAL GRANDE ---
+    """
+      ___
+     /   \\
+    | o o |
+     \\___/
+      |||
+     |   |
+     |   |
+     |   |
+     |   |
+    /     \\
+   /       \\
+  |         |
+  |  8===D  |
+   \\_________/
+   ~~~~~~~~~~~~""",
+
+    # --- LA TORRE EIFFEL ---
+    """
+       *
+      /|\\
+     / | \\
+    /  8  \\
+   /  ===  \\
+  /  ===D~  \\
+ /~~~~~~~~~~~\\
+/|___________|\\""",
+
+    # --- EL MICROFONO DE CUERO ---
+    """
+    _____
+   /     \\
+  | () () |
+  |       |
+   \\ ___ /
+     | |
+     | |
+     | |
+    /   \\
+   /     \\
+  |  8=D  |
+  |~~~~~~~|
+   \\_____/
+  "MICROFONO DE CUERO" """,
+
+    # --- EL CUCHUFLÍ ---
+    """
+  +---------+
+  |:::::::::| <--- cuchuflí de carne
+  |:::::::::|
+  |:::::::::| ~~~
+  |:::::::::| ~~~~
+  |:::::::::| ~~~~~
+  +---------+""",
+
+    # --- LA PISTOLA DE QUAKER ---
+    """
+  ___________
+ |           |===D~~~
+ |  PISTOLA  |
+ |  QUAKER   |
+ |___________|
+      |
+     ===
+    =====
+     | |""",
+
+    # --- EL CICLOPE LLORÓN ---
+    """
+      ___
+     /   \\
+    | ( ) |   <-- ojo
+    |  |  |
+     \\_|_/
+      | |
+      | |
+   8==| |==D
+      | |
+    ~~| |~~
+   ~~~| |~~~  (llorando)""",
+
+    # --- LA ANACONDA ---
+    """
+  ~  ~  ~  ~  ~  ~  8====D
+ ~                          ~
+~    ANACONDA IMPERIAL        ~
+ ~                          ~
+  ~  ~  ~  ~  ~  ~  ~  ~  ~""",
+
+    # --- EL ESCUPE SÉMOLA (surtidor) ---
+    """
+               * * *
+              *     *
+             *   *   *
+            *  *   *  *
+           *             *
+          *               *
+         *   ESCUPE SEMOLA *
+          *               *
+           *             *
+            \\           /
+             \\         /
+              \\  8=D  /
+               \\_____/""",
+
+    # --- EL GANSO ---
+    """
+     ___
+    /   \\      <-- cabeza del ganso
+   ( o   )
+    \\ _ /
+      | |
+      | |     "el ganso"
+      | |
+  8===| |===D~~~""",
+
+    # --- EL SUBMARINO ---
+    """
+             __|__
+            |     |
+  ~~~~~~~~~~|8===D|~~~~~~~~~~
+            |_____|
+           /|     |\\
+          / |     | \\
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  "SUBMARINO DE CUERO"  """,
+
+    # --- LA PALANCA ---
+    """
+    _____
+   |     |
+   |     |
+   |     |        LA PALANCA
+   |     |    ==================>
+   |     |
+   |_____|
+   /|   |\\
+  / |   | \\
+     | |
+     |_|""",
+
+    # --- LA HERRAMIENTA (llave inglesa) ---
+    """
+    ___
+   /   \\___________
+  | o   8=========D~~~
+   \\___/___________
+
+   "LA HERRAMIENTA" """,
+
+    # --- EL MATASAPO PELADO ---
+    """
+  .-------.
+ /  PELAO  \\
+|  MATASAPO |
+ \\_________/
+      |
+      |  8====D~~~
+      |
+  (  ) (  )
+  "PELAO MATASAPO"  """,
+
+    # --- BANDERA ---
+    """
+  8====D~~~|  REPUBLICA
+           |  INDEPENDIENTE
+           |  DE LA
+           |  PICHULA""",
+
+    # --- EL CAMPEÓN (con copa) ---
+    """
+      ___
+     /   \\
+    | 1er |
+     \\___/
+      |||
+    ___|___
+   /       \\
+  | CAMPEON |
+  |  PICHULA|
+   \\_______/
+   8========D~~~~""",
+
+    # --- EL COHETE ESPACIAL V2 ---
+    """
+         /\\
+        /  \\
+       /    \\
+      / 8==  \\
+     / ====   \\
+    / ====D~~  \\
+   /~~~~~~~~~~~~\\
+  | () () () () |
+  |_____________|
+       ||||
+      ||  ||
+    _||    ||_""",
+
+    # --- LA MANGUERA DE CUERO ---
+    """
+  [===]
+   | |
+   | |    MANGUERA DE CUERO
+   | |    ==================8====D~~~~~~~~
+   | |
+  [===]""",
+
+    # --- MINIMALISTA ARTÍSTICO ---
+    """
+  ─────────────────────────8═══╗
+                                ║
+  ─────────────────────────────╝
+
+  "el puñal de carne" """,
+
+    # --- EL CHAMPIGNON (hongo) ---
+    """
+     _______
+    /       \\
+   /  8===D  \\    <-- sombrero
+  /___________\\
+       |||
+       |||
+      /   \\
+     /     \\
+    |       |
+     \\_____/
+   "EL CHAMPIGNON" """,
+
+    # --- DIAGRAMA TÉCNICO ---
+    """
+  DIAGRAMA TÉCNICO - VISTA LATERAL
+
+  ┌──────┐
+  │  ()  │  <-- unidad productiva bilateral
+  │  ()  │
+  └──┬───┘
+     │
+  ┌──┴──────────────────┐
+  │  8==================D│~~~
+  └─────────────────────┘
+
+  Escala: 1:1 (tamaño real)""",
+
+    # --- EL ARROLLADO DE VENA ---
+    """
+  +---------------------------+
+  |   ARROLLADO DE VENA       |
+  |                           |
+  |  ~~~~~~8========D~~~~~~   |
+  |                           |
+  +---------------------------+""",
+
+    # --- CLÁSICO CON TEMBLOR ---
+    """
+  (  )
+ (    )
+( 8==D )~~
+ (    )
+  (  )
+
+  "el temblor" """,
+
+    # --- CERTIFICADO OFICIAL ---
+    """
+  ╔══════════════════════════════════╗
+  ║   CERTIFICADO DE AUTENTICIDAD    ║
+  ║                                  ║
+  ║   8 = = = = = = = D ~ ~ ~ ~      ║
+  ║                                  ║
+  ║  Se certifica que el portador    ║
+  ║  de este email es 100% pichula   ║
+  ╚══════════════════════════════════╝""",
+
+    # --- EL SEMÁFORO ---
+    """
+   ┌─────┐
+   │  🔴 │  <- bola 1
+   │     │
+   │  🔴 │  <- bola 2
+   │     │
+   │ 8=D │~~
+   └─────┘
+   "el semaforo"  """,
+
+    # --- MAPA DEL TESORO ---
+    """
+  ~  ~  ~  ~  ~  ~  ~  ~  ~
+  ~   X marca el lugar       ~
+  ~                           ~
+  ~    (oo)                   ~
+  ~     ||  8======D~~~~      ~
+  ~     ||                    ~
+  ~  ~  ~  ~  ~  ~  ~  ~  ~  """,
+
+    # --- RECETA DE COCINA ---
+    """
+  ╔══════════════════════════╗
+  ║   RECETA: LONGANIZA      ║
+  ║   al natural             ║
+  ╠══════════════════════════╣
+  ║                          ║
+  ║   ( o )                  ║
+  ║   ( o )                  ║
+  ║    \_/                   ║
+  ║     |                    ║
+  ║  8======D~~~~            ║
+  ║                          ║
+  ║  Porciones: 1            ║
+  ║  Tiempo: toda la noche   ║
+  ╚══════════════════════════╝""",
+
+    # --- INFOGRAFÍA ---
+    """
+  ANATOMÍA DEL SALCHICHON
+  ─────────────────────────────
+  ←  cabeza →   ← cuerpo →
+      ___         ═══════
+     /   \  8 ═══════════ D ~~~
+    | ( ) |
+     \___/
+  ←  testiculario →
+  ( oo )""",
+
+    # --- ESTADÍSTICAS ---
+    """
+  ESTADÍSTICAS DEL DÍA
+  ─────────────────────
+  Pichulas enviadas hoy:  1
+  Tamaño promedio:        8====D
+  Nivel de entusiasmo:    ████████░░ 80%
+  Humedad relativa:       ~~~~~~~~~~~
+  """,
+
+    # --- NOTA MUSICAL ---
+    """
+  ♩  ♪  ♫  ♬  ♩  ♪  ♫  ♬
+
+  8 ═══════ D ~~~
+
+  ♩  ♪  ♫  ♬  ♩  ♪  ♫  ♬
+  "el coyoma canta" """,
+
+    # --- TAROT ---
+    """
+  ┌─────────────────┐
+  │   LA PIRULA     │
+  │                 │
+  │  ( o )  ( o )  │
+  │      \\ /       │
+  │    8══╪══D~~~  │
+  │       |        │
+  │  CARTA XVII    │
+  └─────────────────┘
+  Significado: suerte y abundancia""",
+
+    # --- EL SUSHI ---
+    """
+  ╭─────────────────────────╮
+  │  ·· MENÚ DEL DÍA ··    │
+  │                         │
+  │  Roll de Pepino:        │
+  │                         │
+  │   ====8====D====        │
+  │   ~~~~~~~~~~~~~~~~~~~~  │
+  │                         │
+  │  Chef recomendado       │
+  ╰─────────────────────────╯""",
+
+    # --- MINECRAFT ---
+    """
+  [ ][ ][ ][ ][ ][ ][ ]
+  [ ][ ][ ][ ][ ][ ][ ]
+  [8][=][=][=][=][D][~]
+  [ ][ ][ ][ ][ ][ ][ ]
+  [ ][ ][ ][ ][ ][ ][ ]
+  "pichula pixelada (minecraft edition)" """,
+
+    # --- PRESENTACIÓN POWERPOINT ---
+    """
+  ┌──────────────────────────────┐
+  │  SLIDE 1 / 1                 │
+  │                              │
+  │   Estrategia Q3 2026         │
+  │                              │
+  │      8 ══════ D ~~~          │
+  │                              │
+  │   "crecer en todos los       │
+  │    sentidos del negocio"     │
+  └──────────────────────────────┘""",
+
+    # --- PRONÓSTICO DEL TIEMPO ---
+    """
+  ╔══════════════════════════╗
+  ║  PRONÓSTICO: CALUROSO    ║
+  ║                          ║
+  ║   ☀️  🌡️  ~~~  ~~~  ~~~  ║
+  ║                          ║
+  ║   ( o )                  ║
+  ║    \\ /  8====D~~~~       ║
+  ║     V                    ║
+  ║  Probabilidad de lluvia: ║
+  ║  espesa. 100%.           ║
+  ╚══════════════════════════╝""",
+
+    # --- CÓDIGO QR FALSO ---
+    """
+  ██████████████████████
+  ██ ▄▄▄▄▄ █ 8====D ██
+  ██ █   █ █ ~~~~~~ ██
+  ██ █▄▄▄█ █▄▄▄▄▄▄ ██
+  ██▄▄▄▄▄▄▄█▄▄▄▄▄▄▄██
+  ██████████████████████
+  Escanea para ver más""",
+
+    # --- LA CONSTELACIÓN ---
+    """
+  .  *    .       *    .
+     *  .    *       .
+  .    *   o           *
+         o   .    *
+    *      o     .
+        .    8====D~~~~   *
+  .  *    .       *    .
+  "CONSTELACIÓN: EL CACHALOTE" """,
+
+    # --- EL CONTRATO ---
+    """
+  POR MEDIO DEL PRESENTE INSTRUMENTO
+  ─────────────────────────────────
+
+  El suscrito declara haber recibido:
+
+         8 ═══════════ D ~~~
+
+  En perfectas condiciones de uso.
+
+  Firma receptor: _____________
+
+  Fecha: hoy. Lugar: tu cara.""",
+
+    # --- HISTOGRAMA ---
+    """
+  DISTRIBUCIÓN DE TAMAÑOS
+  ─────────────────────────
+  XS  │█
+  S   │███
+  M   │███████
+  L   │█████████████
+  XL  │███████████████████
+  TU  │8======D~~~~
+      └──────────────────""",
+
+    # --- TICKET DE ESTACIONAMIENTO ---
+    """
+  ┌────────────────────────┐
+  │  TICKET N° 00069       │
+  │  ESTACIONAMIENTO FULL  │
+  │                        │
+  │  Vehículo: ANACONDA    │
+  │  Largo: 8=======D~~~~  │
+  │  Hora entrada: 00:00   │
+  │  Hora salida: nunca    │
+  │                        │
+  │  TARIFA: tu dignidad   │
+  └────────────────────────┘""",
+
+    # --- EL DIAGRAMA DE FLUJO ---
+    """
+  ¿Tiene ganas?
+       │
+       ▼
+  ┌─────────┐    NO    ┌──────────────┐
+  │  8====D │ ──────► │ igual 8====D │
+  └─────────┘         └──────────────┘
+       │ SI
+       ▼
+   ~~~~~~~~~~
+  "el flujograma" """,
+
+    # --- LA ECUACIÓN ---
+    """
+  ┌────────────────────────────┐
+  │                            │
+  │   8 + ====== + D = ~~~~    │
+  │                            │
+  │   TEOREMA DE PITUCHAGORAS  │
+  │   comprobado               │
+  └────────────────────────────┘""",
+
+    # --- EL TRENDING TOPIC ---
+    """
+  TWITTER / X  —  TRENDING NOW
+  ─────────────────────────────
+  1. #Pichula          8====D
+  2. #Longaniza         8=====D~
+  3. #CallampaFina     8==D~~
+  4. #ObeliscoDeCarne  8=========D~~~~
+  5. #Matias           ...
+  ─────────────────────────────""",
+
+    # --- LOADING BAR ---
+    """
+  Cargando motivación...
+
+  [████████████████████] 100%
+
+  8 ══════════════════ D ~~~~
+
+  ¡Listo! Que tengas un buen día.""",
+
+    # --- WHATSAPP FAKE ---
+    """
+  ┌─────────────────────────────┐
+  │ 📱 WhatsApp                 │
+  │ ─────────────────────────── │
+  │ Matias: hola como estai     │
+  │                             │
+  │              8====D~~~  ✓✓ │
+  │                             │
+  │ Matias: ...                 │
+  │ Matias está escribiendo...  │
+  └─────────────────────────────┘""",
+
+    # --- EL FÓSIL ---
+    """
+  HALLAZGO PALEONTOLÓGICO
+  MUSEO DE HISTORIA NATURAL
+  ──────────────────────────
+
+   fossilus pichulensis
+   Era: Pleistoceno
+
+   ( o )──8═══════D~~~~
+   ( o )
+
+  "espécimen en excelente estado" """,
+]
+
 HEMAN_SHORTS = [
     "https://www.youtube.com/shorts/Dg8tHpjqxfQ",   # hombre sabio
     "https://www.youtube.com/shorts/tpNn0-s97Xo",   # combatir el estres
@@ -258,11 +831,32 @@ def get_heman_link():
     idx = datetime.now().timetuple().tm_yday % len(HEMAN_SHORTS)
     return HEMAN_SHORTS[idx]
 
-def build_body(ai_body):
-    heman = get_heman_link()
-    return f"{ai_body}\n\n---\nWordle de hoy: {WORDLE_URL}\nHe-Man del dia: {heman}"
+def build_parts(ai_body):
+    """Retorna (plain_body, ascii_art, heman, wordle) como componentes separados."""
+    heman     = get_heman_link()
+    ascii_art = random.choice(ASCII_PENES)
+    return ai_body, ascii_art, heman
 
-def send_email(subject, body):
+def build_plain(ai_body, ascii_art, heman):
+    return f"{ai_body}\n\n{ascii_art}\n\n---\nWordle de hoy: {WORDLE_URL}\nHe-Man del dia: {heman}"
+
+def build_html(ai_body, ascii_art, heman):
+    import html as html_lib
+    text_html  = html_lib.escape(ai_body).replace('\n', '<br>')
+    ascii_html = html_lib.escape(ascii_art).strip('\n')
+    wordle_url = html_lib.escape(WORDLE_URL)
+    heman_url  = html_lib.escape(heman)
+    return f"""<html><head><meta charset="utf-8"></head>
+<body style="font-family: Arial, sans-serif; font-size: 14px; color: #222;">
+<p>{text_html}</p>
+<pre style="font-family: 'Courier New', Courier, monospace; font-size: 13px; line-height: 1.4; background: #f4f4f4; padding: 12px; border-radius: 4px; display: inline-block; white-space: pre;">{ascii_html}</pre>
+<p style="color: #666; font-size: 12px;">---<br>
+<a href="{wordle_url}">Wordle de hoy</a> &nbsp;|&nbsp;
+<a href="{heman_url}">He-Man del dia</a>
+</p>
+</body></html>"""
+
+def send_email(subject, ai_body, ascii_art, heman):
     from email.mime.text import MIMEText
     from email.mime.multipart import MIMEMultipart
 
@@ -270,13 +864,17 @@ def send_email(subject, body):
     to_email   = 'matias.levy@alyplas.cl'
     bcc_email  = 'fcruz@celtavia.cl'
 
+    plain = build_plain(ai_body, ascii_art, heman)
+    html  = build_html(ai_body, ascii_art, heman)
+
     print(f"Enviando a {to_email}...")
-    message = MIMEMultipart()
+    message = MIMEMultipart('alternative')
     message['From']    = from_email
     message['To']      = to_email
     message['Bcc']     = bcc_email
     message['Subject'] = subject
-    message.attach(MIMEText(body, 'plain', 'utf-8'))
+    message.attach(MIMEText(plain, 'plain', 'utf-8'))
+    message.attach(MIMEText(html,  'html',  'utf-8'))
 
     raw  = base64.urlsafe_b64encode(message.as_bytes()).decode('utf-8')
     data = json.dumps({'raw': raw}).encode('utf-8')
@@ -320,13 +918,13 @@ def main():
     history, history_sha = load_history()
     ai_content = generate_ai_content(config, day_info, history)
 
-    subject = ai_content['subject']
-    body    = build_body(ai_content['body'])
+    subject            = ai_content['subject']
+    ai_body, ascii_art, heman = build_parts(ai_content['body'])
 
     print(f"\nAsunto: {subject}")
-    print(f"Mensaje:\n{body}\n")
+    print(f"Mensaje:\n{build_plain(ai_body, ascii_art, heman)}\n")
 
-    success = send_email(subject, body)
+    success = send_email(subject, ai_body, ascii_art, heman)
 
     if success:
         history.append({'date': datetime.now().strftime('%Y-%m-%d'), 'subject': subject, 'body': ai_content['body']})
