@@ -16,6 +16,7 @@ import json
 import sys
 import base64
 import random
+import unicodedata
 from datetime import datetime
 
 if sys.platform == 'win32':
@@ -600,6 +601,62 @@ ASCII_PENES = [
   "espécimen en excelente estado" """,
 ]
 
+ASCII_NAMES = [
+    "El Clásico",
+    "El Grandote",
+    "El Colgante",
+    "El Completo",
+    "El Zurdo",
+    "El Invertido",
+    "El Obelisco de Carne",
+    "El Cohete",
+    "El Clásico Vertical Grande",
+    "La Torre Eiffel",
+    "El Micrófono de Cuero",
+    "El Cuchuflí",
+    "La Pistola de Quaker",
+    "El Cíclope Llorón",
+    "La Anaconda",
+    "El Escupe Sémola",
+    "El Ganso",
+    "El Submarino de Cuero",
+    "La Palanca",
+    "La Herramienta",
+    "El Matasapo Pelado",
+    "La Bandera",
+    "El Campeón de la Pichula",
+    "El Cohete Espacial V2",
+    "La Manguera de Cuero",
+    "El Puñal de Carne",
+    "El Champignon",
+    "El Diagrama Técnico",
+    "El Arrollado de Vena",
+    "El Temblor",
+    "El Certificado de Autenticidad",
+    "El Semáforo",
+    "El Mapa del Tesoro",
+    "La Longaniza al Natural",
+    "Anatomía del Salchichón",
+    "Estadísticas del Día",
+    "El Coyoma Canta",
+    "La Pirula (Carta XVII)",
+    "El Roll de Pepino",
+    "Pichula Pixelada (Minecraft Edition)",
+    "Estrategia Q3 2026",
+    "Pronóstico: Caluroso",
+    "Código QR Misterioso",
+    "Constelación: El Cachalote",
+    "El Contrato",
+    "Histograma de Tamaños",
+    "Ticket de Estacionamiento N°00069",
+    "El Flujograma",
+    "Teorema de Pituchagoras",
+    "Trending Topic",
+    "Loading Bar",
+    "WhatsApp (conversación real)",
+    "El Fósil (fossilus pichulensis)",
+]
+
 HEMAN_SHORTS = [
     "https://www.youtube.com/shorts/Dg8tHpjqxfQ",   # hombre sabio
     "https://www.youtube.com/shorts/tpNn0-s97Xo",   # combatir el estres
@@ -719,11 +776,11 @@ def get_matias_replies():
 # Construir prompt
 def build_prompt(config, day_info, history_subjects, matias_reply):
     estilos_map = {
-        'chiste':   'CHISTE CORTO al estilo Alvaro Salas o Charly Badulaque: humor chileno, liviano, con remate.',
+        'chiste':   'CHISTE de verdad, al estilo Alvaro Salas o Charly Badulaque: humor chileno. OBLIGATORIO empezar el body con "Hoy toca un chiste:" y un salto de linea. Estructura clasica: SETUP que arma una situacion + PUNCHLINE que da un giro inesperado. El remate (referencia al pene/gay) ES el punchline integrado al chiste, NO un detalle agregado al final. Tiene que dar risa de verdad: si se puede quitar el remate y el chiste sigue igual, esta MALO. Puede ser pregunta-respuesta, dialogo, o mini-relato con vuelta. Si el chiste ocupa 3 o mas lineas, OBLIGATORIO que rimen (AABB/ABAB/ABBA); si no puedes hacerlo rimar, dejalo en 1 o 2 lineas.',
         'sabio':    'FRASE ABSURDA DE SABIO ANTIGUO: inventada, que suene profunda pero sea una estupidez. Cita a Confucio, Aristoteles, Sun Tzu, Seneca, etc.',
         'graffiti': 'FRASE DE GRAFFITI: absurda, poetica de forma ridicula, remate inesperado.',
         'action':   'ESTILO ANTI-CHUCK NORRIS: Matias NO es un duro. Usa a Stallone, Van Damme, Seagal, Bruce Lee, Schwarzenegger, La Roca, Statham.',
-        'paya':     'PAYA CHILENA: cuarteta de 4 versos en rima ABAB o ABCB, estilo payador campesino chileno. Maximo 2 versos de setup, remate picante en los ultimos 2.',
+        'paya':     'PAYA CHILENA: cuarteta de 4 versos, estilo payador campesino chileno. OBLIGATORIO: elige uno de estos esquemas de rima y aplicalo ESTRICTAMENTE: ABAB (riman v1-v3 y v2-v4), AABB (riman v1-v2 y v3-v4), o ABBA (riman v1-v4 y v2-v3). La rima es terminacion sonora identica desde la ultima vocal tonica. Si los versos no riman segun el esquema elegido, el texto es INVALIDO. Remate picante en los ultimos 2 versos.',
         'cuento':   'CUENTO ULTRA-BREVE: historia de maximo 4 lineas. Personaje, situacion, giro, remate. Estilo absurdo o de humor negro chileno.',
     }
 
@@ -777,6 +834,7 @@ gay, maricón, maraco, weco, cola, fleto, wekreke, cotito, loca, loquita, colipa
 
 FORMATO:
 {formato_chars}
+- REGLA DE RIMA (OBLIGATORIA): si el body ocupa 3 o mas lineas, TODOS los versos deben rimar (esquema AABB, ABAB o ABBA; rima = misma terminacion sonora desde la ultima vocal tonica). Si no logras que rime, condensa el mensaje en 1 o 2 lineas. NUNCA envies 3 o mas lineas que no rimen.
 - Sin emojis
 - Sin preguntar por planes
 - Firma: "Sensei"
@@ -795,12 +853,131 @@ def get_day_info():
     now = datetime.now()
     return {'date': now.strftime('%d/%m/%Y'), 'day': days_es.get(now.strftime('%A'), now.strftime('%A'))}
 
+# Cuota semanal: 3 rimas (paya) + 2 frases. Paya = rima; el resto = frase.
+FRASE_STYLES = ['sabio', 'graffiti', 'action', 'chiste']
+
+def pick_style_for_day(config):
+    """Distribuye la semana: Lun/Mie/Vie = paya (rima), Mar/Jue = frase.
+    Las frases rotan por semana para variar. Si config fija un estilo
+    distinto de 'auto', se respeta ese estilo (override manual)."""
+    estilo_cfg = config.get('estilo', 'auto')
+    if estilo_cfg != 'auto':
+        return estilo_cfg
+    now = datetime.now()
+    wd = now.weekday()  # 0=Lun ... 4=Vie
+    if wd in (0, 2, 4):
+        return 'paya'
+    week = now.isocalendar()[1]
+    offset = 0 if wd == 1 else 1  # Mar vs Jue usan frases distintas
+    return FRASE_STYLES[(week * 2 + offset) % len(FRASE_STYLES)]
+
+# --- Verificacion de rima para payas ---
+_VOWELS = 'aeiouáéíóúü'
+
+def _strip_accents(s):
+    return ''.join(c for c in unicodedata.normalize('NFD', s)
+                   if unicodedata.category(c) != 'Mn')
+
+def _vowel_groups(w):
+    groups, i, n = [], 0, len(w)
+    while i < n:
+        if w[i] in _VOWELS:
+            groups.append(i)
+            while i < n and w[i] in _VOWELS:
+                i += 1
+        else:
+            i += 1
+    return groups
+
+def _rhyme_tail(word):
+    w = word.lower().strip(' .,;:!?"\'`-—()¡¿…«»“”')
+    if not w:
+        return ''
+    groups = _vowel_groups(w)
+    if not groups:
+        return _strip_accents(w)
+    acc = None
+    for idx, c in enumerate(w):
+        if c in 'áéíóú':
+            acc = idx
+    if acc is not None:
+        start = acc
+        while start > 0 and w[start - 1] in _VOWELS:
+            start -= 1
+    else:
+        last = w[-1]
+        if last in 'aeiou' or last in 'ns':
+            start = groups[-2] if len(groups) >= 2 else groups[-1]
+        else:
+            start = groups[-1]
+    return _strip_accents(w[start:])
+
+def _rhymes(a, b):
+    ta, tb = _rhyme_tail(a), _rhyme_tail(b)
+    return ta != '' and ta == tb
+
+def paya_rhymes_ok(body):
+    """True si las 4 lineas riman segun ABAB, AABB o ABBA."""
+    lines = [l.strip() for l in body.split('\n') if l.strip()]
+    lines = [l for l in lines if l.lower().strip('.,!') != 'sensei']
+    verses = [l for l in lines if l.split()][:4]
+    if len(verses) < 4:
+        return False
+    a, b, c, d = (v.split()[-1] for v in verses)
+    abab = _rhymes(a, c) and _rhymes(b, d)
+    aabb = _rhymes(a, b) and _rhymes(c, d)
+    abba = _rhymes(a, d) and _rhymes(b, c)
+    return abab or aabb or abba
+
+def multiline_rhymes_ok(body):
+    """Regla universal: frases de 1-2 lineas estan exentas; 3+ lineas DEBEN rimar.
+    4 lineas -> ABAB/AABB/ABBA. 3 lineas -> al menos un par de versos que rime."""
+    lines = [l.strip() for l in body.split('\n') if l.strip()]
+    lines = [l for l in lines if l.lower().strip('.,!') != 'sensei']
+    verses = [l for l in lines if l.split()]
+    if len(verses) <= 2:
+        return True  # frases cortas no necesitan rima
+    v = verses[:4]
+    ends = [x.split()[-1] for x in v]
+    if len(v) >= 4:
+        a, b, c, d = ends[:4]
+        return ((_rhymes(a, c) and _rhymes(b, d)) or
+                (_rhymes(a, b) and _rhymes(c, d)) or
+                (_rhymes(a, d) and _rhymes(b, c)))
+    a, b, c = ends  # 3 versos
+    return _rhymes(a, b) or _rhymes(b, c) or _rhymes(a, c)
+
 def generate_ai_content(config, day_info, history):
     print("Generando contenido con IA...")
+    estilo_hoy = pick_style_for_day(config)
+    config = {**config, 'estilo': estilo_hoy}
+    print(f"Estilo de hoy ({day_info['day']}): {estilo_hoy}")
     history_subjects = get_history_subjects(history, 7)
     matias_reply = get_matias_replies()
     prompt = build_prompt(config, day_info, history_subjects, matias_reply)
 
+    # Regla universal: ningun body de 3+ lineas se envia sin rimar.
+    ultimo = None
+    for i in range(4):
+        ai = _call_openrouter(prompt, day_info)
+        ultimo = ai
+        if multiline_rhymes_ok(ai.get('body', '')):
+            if i:
+                print(f"Rima OK tras {i+1} intentos.")
+            return ai
+        print(f"Body multilinea NO rima (intento {i+1}/4), regenerando...")
+
+    # Fallback garantizado: generar una paya verificada (siempre rima).
+    print("No logro rimar; fallback a paya.")
+    paya_prompt = build_prompt({**config, 'estilo': 'paya'}, day_info, history_subjects, matias_reply)
+    for i in range(3):
+        ai = _call_openrouter(paya_prompt, day_info)
+        ultimo = ai
+        if paya_rhymes_ok(ai.get('body', '')):
+            return ai
+    return ultimo
+
+def _call_openrouter(prompt, day_info):
     data = json.dumps({
         "model": "anthropic/claude-sonnet-4-5",
         "messages": [{"role": "user", "content": prompt}],
@@ -832,23 +1009,27 @@ def get_heman_link():
     return HEMAN_SHORTS[idx]
 
 def build_parts(ai_body):
-    """Retorna (plain_body, ascii_art, heman, wordle) como componentes separados."""
-    heman     = get_heman_link()
-    ascii_art = random.choice(ASCII_PENES)
-    return ai_body, ascii_art, heman
+    """Retorna (plain_body, ascii_name, ascii_art, heman) como componentes separados."""
+    heman      = get_heman_link()
+    idx        = random.randrange(len(ASCII_PENES))
+    ascii_name = ASCII_NAMES[idx]
+    ascii_art  = ASCII_PENES[idx]
+    return ai_body, ascii_name, ascii_art, heman
 
-def build_plain(ai_body, ascii_art, heman):
-    return f"{ai_body}\n\n{ascii_art}\n\n---\nWordle de hoy: {WORDLE_URL}\nHe-Man del dia: {heman}"
+def build_plain(ai_body, ascii_name, ascii_art, heman):
+    return f"{ai_body}\n\n[ {ascii_name} ]\n{ascii_art}\n\n---\nWordle de hoy: {WORDLE_URL}\nHe-Man del dia: {heman}"
 
-def build_html(ai_body, ascii_art, heman):
+def build_html(ai_body, ascii_name, ascii_art, heman):
     import html as html_lib
     text_html  = html_lib.escape(ai_body).replace('\n', '<br>')
     ascii_html = html_lib.escape(ascii_art).strip('\n')
+    name_html  = html_lib.escape(ascii_name)
     wordle_url = html_lib.escape(WORDLE_URL)
     heman_url  = html_lib.escape(heman)
     return f"""<html><head><meta charset="utf-8"></head>
 <body style="font-family: Arial, sans-serif; font-size: 14px; color: #222;">
 <p>{text_html}</p>
+<p style="font-size:11px; color:#888; margin-bottom:2px;">[ {name_html} ]</p>
 <pre style="font-family: 'Courier New', Courier, monospace; font-size: 13px; line-height: 1.4; background: #f4f4f4; padding: 12px; border-radius: 4px; display: inline-block; white-space: pre;">{ascii_html}</pre>
 <p style="color: #666; font-size: 12px;">---<br>
 <a href="{wordle_url}">Wordle de hoy</a> &nbsp;|&nbsp;
@@ -856,7 +1037,7 @@ def build_html(ai_body, ascii_art, heman):
 </p>
 </body></html>"""
 
-def send_email(subject, ai_body, ascii_art, heman):
+def send_email(subject, ai_body, ascii_name, ascii_art, heman):
     from email.mime.text import MIMEText
     from email.mime.multipart import MIMEMultipart
 
@@ -864,8 +1045,8 @@ def send_email(subject, ai_body, ascii_art, heman):
     to_email   = 'matias.levy@alyplas.cl'
     bcc_email  = 'fcruz@celtavia.cl'
 
-    plain = build_plain(ai_body, ascii_art, heman)
-    html  = build_html(ai_body, ascii_art, heman)
+    plain = build_plain(ai_body, ascii_name, ascii_art, heman)
+    html  = build_html(ai_body, ascii_name, ascii_art, heman)
 
     print(f"Enviando a {to_email}...")
     message = MIMEMultipart('alternative')
@@ -919,12 +1100,12 @@ def main():
     ai_content = generate_ai_content(config, day_info, history)
 
     subject            = ai_content['subject']
-    ai_body, ascii_art, heman = build_parts(ai_content['body'])
+    ai_body, ascii_name, ascii_art, heman = build_parts(ai_content['body'])
 
     print(f"\nAsunto: {subject}")
-    print(f"Mensaje:\n{build_plain(ai_body, ascii_art, heman)}\n")
+    print(f"Mensaje:\n{build_plain(ai_body, ascii_name, ascii_art, heman)}\n")
 
-    success = send_email(subject, ai_body, ascii_art, heman)
+    success = send_email(subject, ai_body, ascii_name, ascii_art, heman)
 
     if success:
         history.append({'date': datetime.now().strftime('%Y-%m-%d'), 'subject': subject, 'body': ai_content['body']})
